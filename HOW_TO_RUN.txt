@@ -1,0 +1,17 @@
+=== HOW TO RUN SynapX Claims Agent (Gemini Version) ===
+
+GET FREE API KEY (takes 1 minute):
+  1. Go to: https://aistudio.google.com/apikey
+  2. Sign in with Google
+  3. Click "Create API Key"
+  4. Copy the key (starts with AIzaSy...)
+
+RUN THE APP:
+  1. Make sure Node.js is installed: https://nodejs.org (LTS version)
+  2. Open terminal/cmd in this folder
+  3. Type:  node server.js
+  4. Open browser: http://localhost:3000
+  5. Paste your Gemini API key in the yellow bar
+  6. Pick a sample → click Analyze Claim!
+
+To STOP: press Ctrl+C in the terminal

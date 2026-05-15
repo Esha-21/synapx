@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>SynapX – FNOL Claims Agent</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@3.19.0/dist/tabler-icons.min.css">
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+  *{box-sizing:border-box;margin:0;padding:0}
+  :root{--ink:#0f0f0f;--ink2:#444;--ink3:#888;--bg:#f8f7f4;--surface:#fff;--border:#e5e3de;--fast:#0a6e3f;--fast-bg:#e8f5ee;--manual:#7a4a00;--manual-bg:#fff3db;--flag:#7a0a2a;--flag-bg:#fde8ef;--specialist:#0a3a7a;--specialist-bg:#e8eef8}
+  body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--ink);min-height:100vh}
+  .shell{display:grid;grid-template-columns:260px 1fr;min-height:100vh}
+  .sidebar{background:var(--ink);color:#fff;padding:2rem 1.5rem;display:flex;flex-direction:column;gap:2rem}
+  .logo{font-size:1.1rem;font-weight:700;letter-spacing:.02em;line-height:1.3}
+  .logo span{display:block;font-size:.75rem;font-weight:400;color:#888;letter-spacing:.08em;text-transform:uppercase;margin-top:.25rem}
+  .nav-label{font-size:.65rem;letter-spacing:.12em;text-transform:uppercase;color:#555;margin-bottom:.5rem}
+  .nav-item{display:flex;align-items:center;gap:.6rem;padding:.5rem .75rem;border-radius:6px;cursor:pointer;font-size:.875rem;color:#aaa;transition:all .15s;margin-bottom:.2rem}
+  .nav-item.active,.nav-item:hover{background:#1a1a1a;color:#fff}
+  .nav-item i{font-size:16px}
+  .stats-bar{margin-top:auto;border-top:1px solid #222;padding-top:1.5rem;display:flex;flex-direction:column;gap:.75rem}
+  .stat-row{display:flex;justify-content:space-between;align-items:center;font-size:.8rem}
+  .stat-val{font-weight:700;font-size:1rem;font-family:'DM Mono',monospace}
+  .main{padding:2.5rem;overflow-y:auto;background:var(--bg)}
+  .page-header{margin-bottom:2rem}
+  .page-header h1{font-size:1.5rem;font-weight:700;letter-spacing:-.02em}
+  .page-header p{color:var(--ink3);font-size:.9rem;margin-top:.35rem}
+  .tabs{display:flex;gap:.25rem;background:var(--surface);border:1px solid var(--border);border-radius:8px;padding:.25rem;margin-bottom:2rem;width:fit-content}
+  .tab{padding:.4rem 1rem;border-radius:6px;cursor:pointer;font-size:.85rem;transition:all .15s;color:var(--ink3)}
+  .tab.active{background:var(--ink);color:#fff;font-weight:500}
+  .upload-zone{border:2px dashed var(--border);border-radius:12px;padding:3rem;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface)}
+  .upload-zone:hover{border-color:#999;background:#fafafa}
+  .upload-zone i{font-size:2.5rem;color:var(--ink3);display:block;margin-bottom:1rem}
+  .upload-zone h3{font-size:1rem;font-weight:500;margin-bottom:.4rem}
+  .upload-zone p{color:var(--ink3);font-size:.85rem}
+  .textarea-label{font-size:.8rem;font-weight:500;letter-spacing:.04em;text-transform:uppercase;color:var(--ink3);margin-bottom:.5rem;display:block}
+  textarea{width:100%;border:1px solid var(--border);border-radius:8px;padding:1rem;font-size:.875rem;font-family:inherit;resize:vertical;min-height:200px;background:var(--surface);color:var(--ink);outline:none;line-height:1.6}
+  textarea:focus{border-color:#999}
+  .sample-pills{display:flex;gap:.5rem;flex-wrap:wrap;margin-bottom:1.5rem}
+  .pill{padding:.3rem .75rem;border:1px solid var(--border);border-radius:20px;font-size:.78rem;cursor:pointer;background:var(--surface);transition:all .15s;color:var(--ink2)}
+  .pill:hover{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn-primary{background:var(--ink);color:#fff;border:none;padding:.75rem 1.75rem;border-radius:8px;font-size:.9rem;font-weight:500;cursor:pointer;font-family:inherit;letter-spacing:.02em;display:inline-flex;align-items:center;gap:.5rem;transition:opacity .15s}
+  .btn-primary:hover{opacity:.85}
+  .btn-primary:disabled{opacity:.4;cursor:not-allowed}
+  .btn-secondary{background:transparent;color:var(--ink);border:1px solid var(--border);padding:.6rem 1.25rem;border-radius:8px;font-size:.85rem;cursor:pointer;font-family:inherit;transition:all .15s}
+  .btn-secondary:hover{background:var(--surface);border-color:#999}
+  .api-key-bar{background:#fffbe6;border:1px solid #f0d060;border-radius:8px;padding:.75rem 1rem;margin-bottom:1.5rem;display:flex;align-items:center;gap:.75rem;font-size:.85rem}
+  .api-key-bar input{flex:1;border:1px solid #e0c840;border-radius:6px;padding:.4rem .75rem;font-size:.85rem;font-family:'DM Mono',monospace;outline:none}
+  .processing{display:flex;align-items:center;gap:.75rem;padding:1rem 1.25rem;background:#f0efea;border-radius:8px;margin-bottom:1.5rem;font-size:.875rem;color:var(--ink2)}
+  .spinner{width:16px;height:16px;border:2px solid #ccc;border-top-color:var(--ink);border-radius:50%;animation:spin .6s linear infinite;flex-shrink:0}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .result-card{background:var(--surface);border:1px solid var(--border);border-radius:12px;overflow:hidden;margin-bottom:1.5rem}
+  .result-header{padding:1.25rem 1.5rem;border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between}
+  .result-header h2{font-size:1rem;font-weight:600}
+  .result-body{padding:1.5rem}
+  .route-badge{display:inline-flex;align-items:center;gap:.4rem;padding:.3rem .9rem;border-radius:20px;font-size:.8rem;font-weight:600;letter-spacing:.02em}
+  .route-fast{background:var(--fast-bg);color:var(--fast)}
+  .route-manual{background:var(--manual-bg);color:var(--manual)}
+  .route-flag{background:var(--flag-bg);color:var(--flag)}
+  .route-specialist{background:var(--specialist-bg);color:var(--specialist)}
+  .fields-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:1rem}
+  .field-item{background:#fafaf8;border:1px solid var(--border);border-radius:8px;padding:.85rem 1rem}
+  .field-key{font-size:.72rem;font-weight:500;letter-spacing:.08em;text-transform:uppercase;color:var(--ink3);margin-bottom:.3rem}
+  .field-val{font-size:.9rem;font-weight:500;color:var(--ink);font-family:'DM Mono',monospace;word-break:break-all}
+  .field-val.missing{color:#d9534f;font-style:italic;font-family:inherit;font-weight:400}
+  .missing-tag{background:#fff0f0;border:1px solid #fdd;border-radius:20px;padding:.2rem .65rem;font-size:.75rem;color:#c0392b;display:inline-block;margin:.2rem .2rem 0 0}
+  .reasoning-box{background:#f8f7f2;border-left:3px solid var(--ink);border-radius:0 8px 8px 0;padding:1rem 1.25rem;font-size:.875rem;line-height:1.7;color:var(--ink2)}
+  .json-box{background:#111;color:#e2e2e2;border-radius:8px;padding:1.25rem;font-family:'DM Mono',monospace;font-size:.78rem;line-height:1.6;overflow-x:auto;white-space:pre-wrap;word-break:break-all}
+  .json-key{color:#7dd3fc}.json-str{color:#86efac}.json-num{color:#fde68a}.json-bool{color:#f9a8d4}.json-null{color:#94a3b8}
+  .history-item{padding:1rem 1.25rem;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:1rem;cursor:pointer;transition:background .1s}
+  .history-item:hover{background:#fafaf8}
+  .history-item:last-child{border-bottom:none}
+  .history-icon{width:36px;height:36px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
+  .empty-state{text-align:center;padding:4rem 2rem;color:var(--ink3)}
+  .empty-state i{font-size:3rem;display:block;margin-bottom:1rem;color:var(--border)}
+  .copy-btn{background:transparent;border:1px solid #333;color:#aaa;padding:.3rem .75rem;border-radius:6px;font-size:.75rem;cursor:pointer;font-family:'DM Mono',monospace;transition:all .15s}
+  .copy-btn:hover{background:#1a1a1a;color:#fff}
+  .section-title{font-size:.75rem;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--ink3);margin-bottom:.85rem;display:flex;align-items:center;gap:.5rem}
+  .section-title::after{content:'';flex:1;height:1px;background:var(--border)}
+  .alert{padding:.85rem 1rem;border-radius:8px;font-size:.85rem;margin-bottom:1rem;display:flex;gap:.6rem;align-items:flex-start}
+  .alert i{font-size:16px;flex-shrink:0;margin-top:1px}
+  .alert-warn{background:var(--manual-bg);color:var(--manual);border:1px solid #f0d080}
+  .alert-danger{background:var(--flag-bg);color:var(--flag);border:1px solid #f0a0b0}
+  .alert-info{background:var(--specialist-bg);color:var(--specialist);border:1px solid #a0b8e0}
+  .file-chip{display:inline-flex;align-items:center;gap:.5rem;background:var(--surface);border:1px solid var(--border);border-radius:6px;padding:.4rem .85rem;font-size:.82rem;margin-top:.75rem}
+  .file-chip button{background:none;border:none;cursor:pointer;color:var(--ink3);font-size:14px;line-height:1;padding:0 0 0 4px}
+</style>
+</head>
+<body>
+<div class="shell">
+  <aside class="sidebar">
+    <div>
+      <div class="logo">SynapX Claims<span>Insurance AI Engine</span></div>
+    </div>
+    <nav>
+      <div class="nav-label">Workspace</div>
+      <div class="nav-item active" onclick="showTab('process')"><i class="ti ti-file-invoice"></i> Process FNOL</div>
+      <div class="nav-item" onclick="showTab('history')"><i class="ti ti-history"></i> Claim History</div>
+      <div class="nav-item" onclick="showTab('rules')"><i class="ti ti-adjustments"></i> Routing Rules</div>
+    </nav>
+    <div class="stats-bar">
+      <div class="nav-label">Session Stats</div>
+      <div class="stat-row"><span>Processed</span><span class="stat-val" id="stat-total">0</span></div>
+      <div class="stat-row"><span>Fast-track</span><span class="stat-val" style="color:#4ade80" id="stat-fast">0</span></div>
+      <div class="stat-row"><span>Flagged</span><span class="stat-val" style="color:#f87171" id="stat-flag">0</span></div>
+      <div class="stat-row"><span>Manual</span><span class="stat-val" style="color:#fbbf24" id="stat-manual">0</span></div>
+    </div>
+  </aside>
+
+  <main class="main">
+    <div id="tab-process">
+      <div class="page-header">
+        <h1>Process FNOL Document</h1>
+        <p>Upload or paste a First Notice of Loss document to extract fields, detect issues, and route the claim.</p>
+      </div>
+
+      <div class="api-key-bar">
+        <i class="ti ti-key" style="font-size:18px;color:#b08000"></i>
+        <span style="color:#7a5a00;font-weight:500">Google Gemini API Key:</span>
+        <input type="password" id="api-key" placeholder="AIzaSy..." />
+        <span style="color:#888;font-size:.78rem">Never stored, only used in-browser</span>
+      </div>
+
+      <div class="tabs">
+        <div class="tab active" id="input-tab-paste" onclick="switchInputTab('paste')">Paste Text</div>
+        <div class="tab" id="input-tab-upload" onclick="switchInputTab('upload')">Upload PDF/TXT</div>
+        <div class="tab" id="input-tab-sample" onclick="switchInputTab('sample')">Use Sample</div>
+      </div>
+
+      <div id="input-paste">
+        <span class="textarea-label">FNOL Document Text</span>
+        <textarea id="fnol-text" placeholder="Paste the full text of the FNOL document here..."></textarea>
+      </div>
+
+      <div id="input-upload" style="display:none">
+        <div class="upload-zone" onclick="document.getElementById('file-input').click()">
+          <i class="ti ti-cloud-upload"></i>
+          <h3>Drop PDF or TXT file here</h3>
+          <p>or click to browse</p>
+        </div>
+        <input type="file" id="file-input" accept=".pdf,.txt" style="display:none" onchange="handleFile(event)">
+        <div id="file-chip-area"></div>
+      </div>
+
+      <div id="input-sample" style="display:none">
+        <span class="textarea-label">Select a sample FNOL scenario</span>
+        <div class="sample-pills">
+          <div class="pill" onclick="loadSample('fast')">Fast-track Auto Claim</div>
+          <div class="pill" onclick="loadSample('manual')">Missing Fields (Manual Review)</div>
+          <div class="pill" onclick="loadSample('fraud')">Fraud Investigation Flag</div>
+          <div class="pill" onclick="loadSample('injury')">Personal Injury → Specialist</div>
+          <div class="pill" onclick="loadSample('complex')">Complex Multi-Party Claim</div>
+        </div>
+        <textarea id="sample-text" placeholder="Select a sample above..." readonly style="background:#fafaf8;cursor:default"></textarea>
+      </div>
+
+      <div style="display:flex;gap:.75rem;align-items:center;margin-top:1.25rem">
+        <button class="btn-primary" onclick="processClaim()" id="process-btn"><i class="ti ti-brain"></i> Analyze Claim</button>
+        <button class="btn-secondary" onclick="clearAll()">Clear</button>
+      </div>
+      <div id="result-area" style="margin-top:2rem"></div>
+    </div>
+
+    <div id="tab-history" style="display:none">
+      <div class="page-header"><h1>Claim History</h1><p>All claims processed in this session.</p></div>
+      <div class="result-card" id="history-list">
+        <div class="empty-state"><i class="ti ti-inbox"></i><p>No claims processed yet.</p></div>
+      </div>
+    </div>
+
+    <div id="tab-rules" style="display:none">
+      <div class="page-header"><h1>Routing Rules</h1><p>Business logic used to classify and route every FNOL claim.</p></div>
+      <div style="display:grid;gap:1rem">
+        <div class="result-card">
+          <div class="result-header"><h2>Routing Logic</h2></div>
+          <div class="result-body" style="display:grid;gap:.75rem">
+            <div class="alert alert-danger"><i class="ti ti-flag"></i><div><strong>Investigation Flag:</strong> Description contains: "fraud", "inconsistent", "staged", "fabricated", "suspicious", "falsified"</div></div>
+            <div class="alert alert-info" style="background:#f0f4ff;color:#1a3a8a;border-color:#c0cff0"><i class="ti ti-stethoscope"></i><div><strong>Specialist Queue:</strong> Claim type = "injury" or "personal injury"</div></div>
+            <div class="alert alert-warn"><i class="ti ti-alert-triangle"></i><div><strong>Manual Review:</strong> Any mandatory field is missing or cannot be extracted</div></div>
+            <div class="alert alert-info"><i class="ti ti-bolt"></i><div><strong>Fast-track:</strong> Damage &lt; ₹25,000 AND all mandatory fields present AND no fraud indicators</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+const SAMPLES = {
+  fast: `FIRST NOTICE OF LOSS — AUTO CLAIM\n\nPolicy Number: POL-2024-78923\nPolicyholder Name: Rajesh Kumar\nPolicy Effective Dates: 01/04/2024 – 31/03/2025\n\nIncident Date: 12/11/2024\nIncident Time: 14:35\nIncident Location: NH-48, Pune–Mumbai Expressway, near Khopoli Exit\nIncident Description: Policyholder's vehicle was rear-ended by a truck at low speed during traffic slowdown. Minor dent on rear bumper and broken tail lamp.\n\nClaimant: Rajesh Kumar\nContact Details: rajesh.kumar@email.com | +91-98200-45678\nThird Parties: Truck driver Suresh Patil, vehicle MH-12-BZ-4521\n\nAsset Type: Motor Vehicle\nAsset ID: MH-01-CQ-9988 (Honda City 2022)\nEstimated Damage: ₹18,500\nClaim Type: Property Damage\nAttachments: Photos of vehicle damage, FIR copy\nInitial Estimate: ₹18,500`,
+  manual: `FIRST NOTICE OF LOSS\n\nPolicy Number: POL-2024-33412\nPolicyholder Name: Ananya Iyer\n\nIncident Date: 05/11/2024\nIncident Location: Koramangala, Bangalore\nIncident Description: House flooding due to blocked drainage. Living room and bedroom floors damaged.\n\nClaimant: Ananya Iyer\n\nAsset Type: Residential Property\nEstimated Damage: ₹92,000\nClaim Type: Property Damage\nAttachments: Photographs`,
+  fraud: `FIRST NOTICE OF LOSS\n\nPolicy Number: POL-2023-19201\nPolicyholder Name: Vikram Sharma\nPolicy Effective Dates: 15/01/2023 – 14/01/2024\n\nIncident Date: 30/10/2024\nIncident Time: 23:15\nIncident Location: Outer Ring Road, Bangalore\nIncident Description: Claimant reports vehicle collision, however witness statements are inconsistent with the damage pattern. Multiple parties involved appear staged. Physical evidence suggests the incident may have been fabricated for insurance purposes.\n\nClaimant: Vikram Sharma\nContact Details: vikram.s@gmail.com | +91-90000-11122\n\nAsset Type: Motor Vehicle\nAsset ID: KA-03-MN-7761 (Maruti Swift 2020)\nEstimated Damage: ₹65,000\nClaim Type: Property Damage\nAttachments: Police report\nInitial Estimate: ₹65,000`,
+  injury: `FIRST NOTICE OF LOSS — PERSONAL INJURY\n\nPolicy Number: POL-2024-56210\nPolicyholder Name: Priya Nair\nPolicy Effective Dates: 01/06/2024 – 31/05/2025\n\nIncident Date: 08/11/2024\nIncident Time: 09:20\nIncident Location: Brigade Road, Bangalore\nIncident Description: Policyholder slipped and fell in a commercial premises due to wet floor with no warning signage. Sustained fractures in left wrist and bruising to the knee.\n\nClaimant: Priya Nair\nContact Details: priya.nair@outlook.com | +91-98765-43210\nThird Parties: Brigade Retail Pvt Ltd (premises owner)\n\nAsset Type: N/A\nEstimated Damage: ₹2,40,000\nClaim Type: Personal Injury\nAttachments: Medical reports, hospital bills, incident photos\nInitial Estimate: ₹2,40,000`,
+  complex: `FIRST NOTICE OF LOSS — MULTI-VEHICLE INCIDENT\n\nPolicy Number: POL-2024-10087\nPolicyholder Name: Arjun Mehta\nPolicy Effective Dates: 01/03/2024 – 28/02/2025\n\nIncident Date: 14/11/2024\nIncident Time: 17:45\nIncident Location: NICE Road, Bangalore South\nIncident Description: Three-vehicle pile-up during heavy rain. Policyholder's SUV was struck from behind, causing it to collide with the vehicle in front. Airbags deployed. Policyholder sustained minor whiplash.\n\nClaimant: Arjun Mehta\nContact Details: arjun.mehta@company.com | +91-97000-88990\nThird Parties: Ravi Chandran (KA-09-PQ-2231), Deepa Rao (KA-05-LM-9911)\n\nAsset Type: Motor Vehicle\nAsset ID: KA-01-HB-1234 (Toyota Fortuner 2023)\nEstimated Damage: ₹1,85,000\nClaim Type: Combined (Property Damage + Personal Injury)\nAttachments: Police FIR, hospital discharge summary, vehicle photos\nInitial Estimate: ₹1,85,000`
+};
+
+let history=[], stats={total:0,fast:0,flag:0,manual:0}, currentInputTab='paste', uploadedText='';
+
+function showTab(name){
+  ['process','history','rules'].forEach(t=>{ document.getElementById('tab-'+t).style.display=t===name?'block':'none'; });
+  document.querySelectorAll('.nav-item').forEach(el=>{ el.classList.toggle('active', el.getAttribute('onclick')===`showTab('${name}')`); });
+  if(name==='history') renderHistory();
+}
+function switchInputTab(name){
+  currentInputTab=name;
+  ['paste','upload','sample'].forEach(t=>{ document.getElementById('input-'+t).style.display=t===name?'block':'none'; document.getElementById('input-tab-'+t).classList.toggle('active',t===name); });
+}
+function loadSample(key){ document.getElementById('sample-text').value=SAMPLES[key]; }
+function handleFile(e){
+  const file=e.target.files[0]; if(!file) return;
+  const reader=new FileReader();
+  reader.onload=ev=>{ uploadedText=ev.target.result; document.getElementById('file-chip-area').innerHTML=`<div class="file-chip"><i class="ti ti-file-text"></i>${file.name}<button onclick="clearFile()"><i class="ti ti-x"></i></button></div>`; };
+  reader.readAsText(file);
+}
+function clearFile(){ uploadedText=''; document.getElementById('file-chip-area').innerHTML=''; document.getElementById('file-input').value=''; }
+function clearAll(){ document.getElementById('fnol-text').value=''; document.getElementById('sample-text').value=''; clearFile(); document.getElementById('result-area').innerHTML=''; }
+function getInputText(){
+  if(currentInputTab==='paste') return document.getElementById('fnol-text').value.trim();
+  if(currentInputTab==='upload') return uploadedText.trim();
+  if(currentInputTab==='sample') return document.getElementById('sample-text').value.trim();
+  return '';
+}
+
+async function processClaim(){
+  const text=getInputText(); if(!text){ alert('Please provide FNOL document text first.'); return; }
+  const apiKey=document.getElementById('api-key').value.trim(); if(!apiKey){ alert('Please enter your Anthropic API key.'); return; }
+  const btn=document.getElementById('process-btn'); btn.disabled=true;
+  const area=document.getElementById('result-area');
+  area.innerHTML=`<div class="processing"><div class="spinner"></div><span>Extracting fields and classifying claim via Claude AI…</span></div>`;
+  const systemPrompt=`You are an expert insurance claims analyst AI. Analyze FNOL documents and return structured JSON only.
+
+Extract ALL fields (null if not found): policyNumber, policyholderName, effectiveDateStart, effectiveDateEnd, incidentDate, incidentTime, incidentLocation, incidentDescription, claimantName, thirdParties (array), contactEmail, contactPhone, assetType, assetId, estimatedDamage (number), claimType, attachments (array), initialEstimate (number).
+
+Routing rules (priority order):
+1. If description contains fraud/inconsistent/staged/fabricated/suspicious/falsified → "Investigation Flag"
+2. If claimType includes injury → "Specialist Queue"  
+3. If ANY mandatory field is null → "Manual Review"
+   Mandatory: policyNumber, policyholderName, incidentDate, incidentLocation, incidentDescription, claimantName, contactEmail or contactPhone, assetType, estimatedDamage, claimType, initialEstimate
+4. If estimatedDamage < 25000 → "Fast-track"
+5. Else → "Manual Review"
+
+Return ONLY valid JSON: {"extractedFields":{...},"missingFields":[...],"recommendedRoute":"...","routingTrigger":"...","reasoning":"...","riskScore":1-10,"fraudIndicators":[...]}`;
+  try {
+    const geminiUrl=`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`;
+    const resp=await fetch(geminiUrl,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:systemPrompt+'\n\nAnalyze this FNOL:\n\n'+text}]}],generationConfig:{temperature:0.1,maxOutputTokens:4000}})});
+    const data=await resp.json();
+    if(data.error){ area.innerHTML=`<div class='alert alert-danger'><i class='ti ti-alert-circle'></i><div>API Error: ${data.error.message||JSON.stringify(data.error)}</div></div>`; btn.disabled=false; return; }
+    const raw=data.candidates?.[0]?.content?.parts?.[0]?.text?.trim()||'';
+    let result;
+    try{
+      let cleaned = raw.replace(/```json|```/g,'').trim();
+      const s=cleaned.indexOf('{'), e=cleaned.lastIndexOf('}');
+      if(s!==-1&&e!==-1) cleaned=cleaned.slice(s,e+1);
+      result=JSON.parse(cleaned);
+    }
+    catch(e){ area.innerHTML=`<div class="alert alert-danger"><i class="ti ti-alert-circle"></i><div>Parse error. Raw:<br><pre style="font-size:.75rem;white-space:pre-wrap;overflow:auto;max-height:200px">${(raw||'').substring(0,600)}</pre></div></div>`; btn.disabled=false; return; }
+    renderResult(result); addToHistory(result); updateStats(result.recommendedRoute);
+  } catch(err){ area.innerHTML=`<div class="alert alert-danger"><i class="ti ti-alert-circle"></i><div>Error: ${err.message}</div></div>`; }
+  btn.disabled=false;
+}
+
+function routeClass(r){ return r==='Fast-track'?'route-fast':r==='Investigation Flag'?'route-flag':r==='Specialist Queue'?'route-specialist':'route-manual'; }
+function routeIcon(r){ return r==='Fast-track'?'ti-bolt':r==='Investigation Flag'?'ti-flag':r==='Specialist Queue'?'ti-stethoscope':'ti-clock'; }
+
+function renderResult(r){
+  const area=document.getElementById('result-area'), f=r.extractedFields||{}, missing=r.missingFields||[], fraud=r.fraudIndicators||[];
+  const allFields=[['Policy Number','policyNumber'],['Policyholder','policyholderName'],['Eff. Start','effectiveDateStart'],['Eff. End','effectiveDateEnd'],['Incident Date','incidentDate'],['Incident Time','incidentTime'],['Location','incidentLocation'],['Claimant','claimantName'],['Email','contactEmail'],['Phone','contactPhone'],['Asset Type','assetType'],['Asset ID','assetId'],['Damage Estimate','estimatedDamage'],['Claim Type','claimType'],['Initial Estimate','initialEstimate'],['Attachments','attachments']];
+  const fieldsHTML=allFields.map(([label,key])=>{ const val=f[key]; const empty=val===null||val===undefined||val===''; const disp=empty?'— missing':(Array.isArray(val)?val.join(', '):String(val)); return `<div class="field-item"><div class="field-key">${label}</div><div class="field-val ${empty?'missing':''}">${disp}</div></div>`; }).join('');
+  const missingHTML=missing.length?missing.map(m=>`<span class="missing-tag">${m}</span>`).join(''):'<span style="color:var(--fast);font-size:.875rem;font-weight:500">✓ All mandatory fields present</span>';
+  const fraudHTML=fraud.length?`<div class="alert alert-danger" style="margin-top:.75rem"><i class="ti ti-search"></i><div>Fraud keywords: <strong>${fraud.join(', ')}</strong></div></div>`:'';
+  const riskColor=r.riskScore>=8?'#dc2626':r.riskScore>=5?'#d97706':'#16a34a';
+  const jsonStr=JSON.stringify({extractedFields:f,missingFields:missing,recommendedRoute:r.recommendedRoute,reasoning:r.reasoning},null,2);
+  area.innerHTML=`
+    <div class="result-card"><div class="result-header"><h2>Routing Decision</h2><div style="display:flex;align-items:center;gap:.75rem"><span style="font-size:.8rem;color:var(--ink3)">Risk: <strong style="color:${riskColor};font-family:'DM Mono',monospace">${r.riskScore}/10</strong></span><span class="route-badge ${routeClass(r.recommendedRoute)}"><i class="ti ${routeIcon(r.recommendedRoute)}"></i>${r.recommendedRoute}</span></div></div><div class="result-body"><div class="reasoning-box">${r.reasoning}</div>${r.routingTrigger?`<p style="font-size:.8rem;color:var(--ink3);margin-top:.75rem"><strong>Trigger:</strong> ${r.routingTrigger}</p>`:''}</div></div>
+    <div class="result-card"><div class="result-header"><h2>Extracted Fields</h2><span style="font-size:.8rem;color:var(--ink3)">${allFields.length-missing.length}/${allFields.length} found</span></div><div class="result-body"><div class="fields-grid">${fieldsHTML}</div>${f.incidentDescription?`<div style="margin-top:1rem"><div class="section-title">Incident Description</div><p style="font-size:.875rem;line-height:1.7;color:var(--ink2)">${f.incidentDescription}</p></div>`:''}</div></div>
+    <div class="result-card"><div class="result-header"><h2>Missing & Flags</h2></div><div class="result-body"><div class="section-title">Missing Fields</div>${missingHTML}${fraudHTML}</div></div>
+    <div class="result-card"><div class="result-header"><h2>JSON Output</h2><button class="copy-btn" onclick="copyJSON(this)"><i class="ti ti-copy"></i> Copy</button></div><div class="result-body" style="padding:0"><div class="json-box" id="json-out">${syntaxHL(jsonStr)}</div></div></div>`;
+}
+
+function syntaxHL(json){ return json.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"([^"]+)":/g,'<span class="json-key">"$1"</span>:').replace(/: "([^"]*)"/g,': <span class="json-str">"$1"</span>').replace(/: (\d+\.?\d*)/g,': <span class="json-num">$1</span>').replace(/: (true|false)/g,': <span class="json-bool">$1</span>').replace(/: null/g,': <span class="json-null">null</span>'); }
+function copyJSON(btn){ const txt=document.getElementById('json-out')?.innerText; if(txt) navigator.clipboard.writeText(txt).then(()=>{btn.innerHTML='<i class="ti ti-check"></i> Copied';setTimeout(()=>{btn.innerHTML='<i class="ti ti-copy"></i> Copy'},2000)}); }
+function addToHistory(r){ history.unshift({result:r,time:new Date().toLocaleTimeString()}); }
+function renderHistory(){
+  const el=document.getElementById('history-list');
+  if(!history.length){ el.innerHTML='<div class="empty-state"><i class="ti ti-inbox"></i><p>No claims processed yet.</p></div>'; return; }
+  el.innerHTML=history.map((h,i)=>{ const f=h.result.extractedFields||{}; return `<div class="history-item" onclick="viewHistoryItem(${i})"><div class="history-icon ${routeClass(h.result.recommendedRoute)}"><i class="ti ${routeIcon(h.result.recommendedRoute)}"></i></div><div style="flex:1"><div style="font-size:.875rem;font-weight:500">${f.policyholderName||'Unknown'}</div><div style="font-size:.78rem;color:var(--ink3)">${f.policyNumber||'No Policy #'} · ${h.time}</div></div><span class="route-badge ${routeClass(h.result.recommendedRoute)}" style="font-size:.72rem">${h.result.recommendedRoute}</span></div>`; }).join('');
+}
+function viewHistoryItem(i){ showTab('process'); renderResult(history[i].result); }
+function updateStats(route){ stats.total++; if(route==='Fast-track') stats.fast++; else if(route==='Investigation Flag') stats.flag++; else if(route==='Manual Review') stats.manual++; document.getElementById('stat-total').textContent=stats.total; document.getElementById('stat-fast').textContent=stats.fast; document.getElementById('stat-flag').textContent=stats.flag; document.getElementById('stat-manual').textContent=stats.manual; }
+</script>
+</body>
+</html>
